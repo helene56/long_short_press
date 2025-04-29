@@ -12,6 +12,23 @@
 // 1. Turn on LED1 for a short press (<1s).
 // 2. Turn on LED2 for a long press (≥1s).
 
+// todo's
+// 1. get button.
+// 2. configure button.
+// 3. get led0.
+// 4. configure led0.
+// 5. get led1.
+// 6. configure led1.
+// 7. configure isr (interrupt service) callback function for button, 
+//    register when pressed.
+// 8. get output (1 (pressed) or 0 (not pressed)) from button.
+// 9. calculate time between pressed and not pressed.
+// 10. turn led0 on if <1s pressed, turn led1 on if >1s pressed.
+
+
+
+
+
 /*
  * A build error on this line means your board is unsupported.
  * See the sample documentation for information on how to fix this.
