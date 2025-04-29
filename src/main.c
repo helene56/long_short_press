@@ -13,8 +13,8 @@
 // 2. Turn on LED2 for a long press (≥1s).
 
 // todo's
-// 1. get button.
-// 2. configure button.
+// 1. get button.                                                    [x]
+// 2. configure button.                                              [x]
 // 3. get led0.
 // 4. configure led0.
 // 5. get led1.
@@ -27,18 +27,27 @@
 
 
 
-
-
 /*
  * A build error on this line means your board is unsupported.
  * See the sample documentation for information on how to fix this.
  */
 static const struct gpio_dt_spec led = GPIO_DT_SPEC_GET(LED0_NODE, gpios);
+static const struct gpio_dt_spec button = GPIO_DT_SPEC_GET(DT_NODELABEL(button0), gpios);
+
+
 
 int main(void)
 {
 	int ret;
 	bool led_state = true;
+
+	if (!gpio_is_ready_dt(&button))
+	{
+		return -1;
+	}
+
+	// configure button state
+	ret = gpio_pin_interrupt_configure_dt(&button, GPIO_INT_EDGE_TO_ACTIVE);
 
 	if (!gpio_is_ready_dt(&led)) {
 		return 0;
