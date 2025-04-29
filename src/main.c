@@ -1,9 +1,3 @@
-/*
- * Copyright (c) 2016 Intel Corporation
- *
- * SPDX-License-Identifier: Apache-2.0
- */
-
 #include <stdio.h>
 #include <zephyr/kernel.h>
 #include <zephyr/drivers/gpio.h>
@@ -13,6 +7,10 @@
 
 /* The devicetree node identifier for the "led0" alias. */
 #define LED0_NODE DT_ALIAS(led0)
+
+// tasks
+// 1. Turn on LED1 for a short press (<1s).
+// 2. Turn on LED2 for a long press (≥1s).
 
 /*
  * A build error on this line means your board is unsupported.
