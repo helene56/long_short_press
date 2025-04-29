@@ -35,47 +35,47 @@ static const struct gpio_dt_spec button = GPIO_DT_SPEC_GET(DT_NODELABEL(button0)
 
 static struct gpio_callback button_cb_data;
 static uint64_t time_stamp;
-static uint64_t start_time = 0;
+static uint64_t start_time;
 
 void button_pressed(const struct device *dev, struct gpio_callback *cb, uint32_t pins)
 {
-	// do something
-	time_stamp = k_uptime_get();
-	if (time_stamp - start_time <= TIMER_MS)
+	bool pressed = gpio_pin_get_dt(&button);
+	if (pressed)
 	{
-		// turn led1 on/off
-		gpio_pin_toggle_dt(&LED1);
+		// start measuring time
+		start_time = k_uptime_get();
 	}
 	else
 	{
-		gpio_pin_toggle_dt(&LED2);
+		// released! start figuring out which button to toggle
+		if (k_uptime_get() - start_time <= TIMER_MS)
+		{
+			// turn led1 on/off
+			gpio_pin_toggle_dt(&LED1);
+		}
+		else
+		{
+			gpio_pin_toggle_dt(&LED2);
+		}
 	}
-	// update time
-	start_time = k_uptime_get();
-
+	
 }
 
 int main(void)
 {
 	int ret;
+	// check if gpios are ready
+	if (!gpio_is_ready_dt(&LED1)) 
+	{
+		return -1;
+	}
 
 	if (!gpio_is_ready_dt(&button))
 	{
 		return -1;
 	}
 
-	// configure button state
-	ret = gpio_pin_interrupt_configure_dt(&button, GPIO_INT_EDGE_TO_ACTIVE);
-	if (ret < 0) 
-	{
-		return -1;
-	}
-
-	gpio_init_callback(&button_cb_data, button_pressed, BIT(button.pin)); 	
-	gpio_add_callback(button.port, &button_cb_data);
-
-	
-	if (!gpio_is_ready_dt(&LED1)) 
+	if (!gpio_is_ready_dt(&LED2)) 
 	{
 		return -1;
 	}
@@ -86,16 +86,21 @@ int main(void)
 		return -1;
 	}
 
-	if (!gpio_is_ready_dt(&LED2)) 
-	{
-		return -1;
-	}
-
 	ret = gpio_pin_configure_dt(&LED2, GPIO_OUTPUT_LOW);
 	if (ret < 0) 
 	{
 		return -1;
 	}
+
+	// configure button state
+	ret = gpio_pin_interrupt_configure_dt(&button, GPIO_INT_EDGE_BOTH);
+	if (ret < 0) 
+	{
+		return -1;
+	}
+
+	gpio_init_callback(&button_cb_data, button_pressed, BIT(button.pin)); 	
+	gpio_add_callback(button.port, &button_cb_data);
 
 	while (1) {
 		// ret = gpio_pin_toggle_dt(&led);
