@@ -3,7 +3,7 @@
 #include <zephyr/drivers/gpio.h>
 
 /* 1000 msec = 1 sec */
-#define SLEEP_TIME_MS   1000
+#define TIMER_MS   1000
 
 
 // tasks
@@ -17,11 +17,11 @@
 // 4. configure led0.                                                [x]
 // 5. get led1.                                                      [x]
 // 6. configure led1.                                                [x]
-// 7. configure isr (interrupt service) callback function for button, 
+// 7. configure isr (interrupt service) callback function for button,[x] 
 //    register when pressed.
-// 8. get output (1 (pressed) or 0 (not pressed)) from button.
-// 9. calculate time between pressed and not pressed.
-// 10. turn led0 on if <1s pressed, turn led1 on if >1s pressed.
+// 8. get output (1 (pressed) or 0 (not pressed)) from button.       [x]
+// 9. calculate time between pressed and not pressed.                [x]
+// 10. turn led0 on if <1s pressed, turn led1 on if >1s pressed.     [x]
 
 
 
@@ -34,10 +34,25 @@ static const struct gpio_dt_spec LED2 = GPIO_DT_SPEC_GET(DT_NODELABEL(led1), gpi
 static const struct gpio_dt_spec button = GPIO_DT_SPEC_GET(DT_NODELABEL(button0), gpios);
 
 static struct gpio_callback button_cb_data;
+static uint64_t time_stamp;
+static uint64_t start_time = 0;
 
 void button_pressed(const struct device *dev, struct gpio_callback *cb, uint32_t pins)
 {
 	// do something
+	time_stamp = k_uptime_get();
+	if (time_stamp - start_time <= TIMER_MS)
+	{
+		// turn led1 on/off
+		gpio_pin_toggle_dt(&LED1);
+	}
+	else
+	{
+		gpio_pin_toggle_dt(&LED2);
+	}
+	// update time
+	start_time = k_uptime_get();
+
 }
 
 int main(void)
@@ -90,7 +105,7 @@ int main(void)
 
 		// led_state = !led_state;
 		// printf("LED state: %s\n", led_state ? "ON" : "OFF");
-		k_msleep(SLEEP_TIME_MS);
+		k_msleep(TIMER_MS);
 	}
 	return 0;
 }
