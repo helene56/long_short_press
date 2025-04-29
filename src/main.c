@@ -16,7 +16,7 @@
 // 3. get led0.                                                      [x]
 // 4. configure led0.                                                [x]
 // 5. get led1.                                                      [x]
-// 6. configure led1.
+// 6. configure led1.                                                [x]
 // 7. configure isr (interrupt service) callback function for button, 
 //    register when pressed.
 // 8. get output (1 (pressed) or 0 (not pressed)) from button.
@@ -33,12 +33,16 @@ static const struct gpio_dt_spec LED1 = GPIO_DT_SPEC_GET(DT_NODELABEL(led0), gpi
 static const struct gpio_dt_spec LED2 = GPIO_DT_SPEC_GET(DT_NODELABEL(led1), gpios);
 static const struct gpio_dt_spec button = GPIO_DT_SPEC_GET(DT_NODELABEL(button0), gpios);
 
+static struct gpio_callback button_cb_data;
 
+void button_pressed(const struct device *dev, struct gpio_callback *cb, uint32_t pins)
+{
+	// do something
+}
 
 int main(void)
 {
 	int ret;
-	// bool led_state = true;
 
 	if (!gpio_is_ready_dt(&button))
 	{
@@ -47,7 +51,15 @@ int main(void)
 
 	// configure button state
 	ret = gpio_pin_interrupt_configure_dt(&button, GPIO_INT_EDGE_TO_ACTIVE);
+	if (ret < 0) 
+	{
+		return -1;
+	}
 
+	gpio_init_callback(&button_cb_data, button_pressed, BIT(button.pin)); 	
+	gpio_add_callback(button.port, &button_cb_data);
+
+	
 	if (!gpio_is_ready_dt(&LED1)) 
 	{
 		return -1;
