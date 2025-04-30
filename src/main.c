@@ -3,33 +3,8 @@
 #include <zephyr/drivers/gpio.h>
 #include <inttypes.h>
 
-/* 1000 msec = 1 sec */
 #define TIMER_MS   500
 
-
-// tasks
-// 1. Turn on LED1 for a short press (<1s).
-// 2. Turn on LED2 for a long press (≥1s).
-
-// todo's
-// 1. get button.                                                    [x]
-// 2. configure button.                                              [x]
-// 3. get led0.                                                      [x]
-// 4. configure led0.                                                [x]
-// 5. get led1.                                                      [x]
-// 6. configure led1.                                                [x]
-// 7. configure isr (interrupt service) callback function for button,[x] 
-//    register when pressed.
-// 8. get output (1 (pressed) or 0 (not pressed)) from button.       [x]
-// 9. calculate time between pressed and not pressed.                [x]
-// 10. turn led0 on if <1s pressed, turn led1 on if >1s pressed.     [x]
-
-
-
-/*
- * A build error on this line means your board is unsupported.
- * See the sample documentation for information on how to fix this.
- */
 static const struct gpio_dt_spec LED1 = GPIO_DT_SPEC_GET(DT_NODELABEL(led0), gpios);
 static const struct gpio_dt_spec LED2 = GPIO_DT_SPEC_GET(DT_NODELABEL(led1), gpios);
 static const struct gpio_dt_spec button = GPIO_DT_SPEC_GET(DT_NODELABEL(button0), gpios);
